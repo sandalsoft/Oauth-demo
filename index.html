@@ -22,6 +22,16 @@
     </ul>
   </script>
 
+
+  <script type="text/x-handlebars" data-template-name="instagram">
+  <ul>
+  {{#each item in model}}
+    <li>{{item.id}} - <img class="thumbnail" {{bindAttr src="item.images.thumbnail.url"}}>
+      </img></li>
+  {{/each}}
+  </ul>
+  </script>
+
   <script src="js/libs/jquery-1.9.1.js"></script>
   <script src="js/libs/handlebars-1.0.0.js"></script>
   <script src="js/libs/ember-1.0.0-rc.7.js"></script>
