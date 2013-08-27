@@ -1,0 +1,18 @@
+<div class="instagram"></div>
+
+<script src="js/libs/jquery-1.9.1.js"></script>
+<script src="js/libs/instagram.js"></script>
+<script>
+jQuery(function($) {
+
+  $('.instagram').on('didLoadInstagram', function(event, response) {
+    console.log(response);
+  });
+
+  $('.instagram').instagram({
+  userId: '1602125',
+  accessToken: '9df567b8184f43e5897204fc1697af43'
+});
+
+});
+</script>
