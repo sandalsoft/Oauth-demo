@@ -16,7 +16,6 @@ App.CatchmeRoute = Em.Route.extend({
 
 App.IndexRoute = Ember.Route.extend({ 
     redirect: function() {
-      console.log("index hash: " + window.location.hash);
       this.transitionTo('instagram');
 	}
 });
@@ -29,6 +28,8 @@ App.InstagramauthRoute = Em.Route.extend({
     var url = 'https://instagram.com/oauth/authorize/?client_id=' + client_id + '&redirect_uri=' + redirect_uri + '&response_type=token';
   
 		console.log('click: '  + url);
+    window.navigate(url);
+
 	}
 
 });
