@@ -1,27 +1,46 @@
 App = Ember.Application.create();
 
 App.Router.map(function() {
+  this.route("catchme", { path: "*:"});
   this.resource("instagram");
   this.resource("instagramauth");
 });
 
+App.CatchmeRoute = Em.Route.extend({
+  setupController: function() {
+    console.log("hash pipe: " + window.location.hash);
+  }
+});
 
 App.IndexRoute = Ember.Route.extend({ 
     redirect: function() {
+      console.log("index hash: " + window.location.hash);
       this.transitionTo('instagram');
 	}
 });
 
 App.InstagramauthRoute = Em.Route.extend({
-	beforeModel: function() {
-		console.log("hash?: " + window.location.hash);
-	},
 
-	url: 'https://instagram.com/oauth/authorize/?client_id=' + '0bc1b880b6934131be1aba1d76423980' + '&redirect_uri=' + 'http://sandalsoft.com/Oauth-demo/index.html%23/instagramauth' + '&response_type=token',
+
+  // beforeModel: function() {
+  //   console.log("authroute hash: " + window.location.hash);
+  // },
 
 	setupController: function() {
-		console.log('click: '  + this.url);
+    var redirect_uri = 'file:///Users/Eric/Development/Projects/js/_Ember/Oauth-demo/index.html%23/instagramauth';
+    var client_id = '0bc1b880b6934131be1aba1d76423980';
+    var url = 'https://instagram.com/oauth/authorize/?client_id=' + client_id + '&redirect_uri=' + redirect_uri + '&response_type=token';
+  
+		console.log('click: '  + url);
 	}
+
+});
+
+App.InstagramController = Em.ArrayController.extend({
+  instagramtoken: localStorage.instagramtoken,
+  instagramtokenChanged: function() {
+      localStorage.instagramtoken = this.get('instagramtoken');
+   }.observes('instagramtoken'),
 
 });
 
@@ -39,7 +58,7 @@ App.InstagramRoute = Ember.Route.extend({
   model: function(params, transition) {
       var promise = new Ember.RSVP.Promise(function(resolve, reject){
           $.ajax({
-            url:"https://api.instagram.com/v1/users/1574083/?access_token=NO_TOKEN",
+            url:"https://api.instagram.com/v1/users/1574083/?access_token=" + this.instagramtoken,
             // url:"https://api.instagram.com/v1/media/popular?client_id=0bc1b880b6934131be1aba1d76423980",
             type:'GET',
             dataType:'JSONP',
