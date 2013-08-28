@@ -1,4 +1,11 @@
-App = Ember.Application.create();
+App = Ember.Application.create({
+    //  LOG_STACKTRACE_ON_DEPRECATION : true,
+    // LOG_BINDINGS                  : true,
+    LOG_TRANSITIONS               : true,
+    LOG_TRANSITIONS_INTERNAL      : false,
+    // LOG_VIEW_LOOKUPS              : true,
+    // LOG_ACTIVE_GENERATION         : true 
+});
 
 App.Router.map(function() {
   this.route("catchme", { path: "*:"});
@@ -56,7 +63,7 @@ App.InstagramRoute = Ember.Route.extend({
       var promise = new Ember.RSVP.Promise(function(resolve, reject){
         console.log("token: " + localStorage.instagramtoken);
           $.ajax({
-            url:"https://api.instagram.com/v1/users/1574083/?access_token=" + localStorage.instagramtoken,
+            url:"https://api.instagram.com/v1/users/1574083/media/recent?access_token=" + localStorage.instagramtoken,
             // url:"https://api.instagram.com/v1/media/popular?client_id=0bc1b880b6934131be1aba1d76423980",
             type:'GET',
             dataType:'JSONP',
