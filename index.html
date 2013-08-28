@@ -27,8 +27,10 @@
   <p> Pics
   <ul>
   {{#each item in model}}
-    <li>{{item.id}} - <img class="thumbnail" {{bindAttr src="item.images.thumbnail.url"}}>
-      </img></li>
+    <li><a target="_blank" {{bindAttr href="item.images.standard_resolution.url"}}>
+          <img class="thumbnail" {{bindAttr src="item.images.thumbnail.url"}}/>
+      </a>
+      </li>
   {{/each}}
   </ul>
   </script>
