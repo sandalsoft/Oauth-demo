@@ -73,7 +73,7 @@ App.InstagramRoute = Ember.Route.extend({
                     reject(json.meta);
                 }
                 else {
-                    // console.log("RESOLVE json: " + JSON.stringify(json));
+                    // console.log("RESOLVE json: " + JSON.stringify(json)); 
                     resolve(json.data);
                 }   
         });
