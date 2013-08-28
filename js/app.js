@@ -27,7 +27,7 @@ App.InstagramauthRoute = Em.Route.extend({
   // },
 
 	setupController: function() {
-    var redirect_uri = 'file:///Users/Eric/Development/Projects/js/_Ember/Oauth-demo/index.html%23/instagramauth';
+    var redirect_uri = 'http://sandalsoft.com/Oauth-demo/index.html%23/instagramauth';
     var client_id = '0bc1b880b6934131be1aba1d76423980';
     var url = 'https://instagram.com/oauth/authorize/?client_id=' + client_id + '&redirect_uri=' + redirect_uri + '&response_type=token';
   
