@@ -6,6 +6,12 @@ App.Router.map(function() {
   this.resource("instagramauth");
 });
 
+App.IndexRoute = Ember.Route.extend({ 
+    redirect: function() {
+      this.transitionTo('instagram');
+  }
+});
+
 App.CatchmeRoute = Em.Route.extend({
   setupController: function() {
     localStorage.instagramtoken = window.location.hash.split("=")[1];
@@ -14,24 +20,16 @@ App.CatchmeRoute = Em.Route.extend({
   }
 });
 
-App.IndexRoute = Ember.Route.extend({ 
-    redirect: function() {
-      this.transitionTo('instagram');
-	}
-});
+
 
 App.InstagramauthRoute = Em.Route.extend({
-
-	setupController: function() {
+	model: function() { 
+    console.log("in model: of authroute");
     var redirect_uri = 'http://sandalsoft.com/Oauth-demo/index.html%23/instagramauth';
     var client_id = '0bc1b880b6934131be1aba1d76423980';
     var url = 'https://instagram.com/oauth/authorize/?client_id=' + client_id + '&redirect_uri=' + redirect_uri + '&response_type=token';
-  
-		console.log('click: '  + url);
-    window.navigate(url);
-
+    return url;
 	}
-
 });
 
 App.InstagramController = Em.ArrayController.extend({
@@ -46,8 +44,9 @@ App.InstagramRoute = Ember.Route.extend({
   events: {
       error: function(reason, transition) {
           if (reason.code === 400) {
-              // console.log('in evetns hook.  Unauthorized, redirecting to: ' + App.Instagram.authURL);
-              this.transitionTo(App.Instagramauth);
+              console.log('in evetns hook.  Unauthorized, redirecting to: Instagramauth');
+  
+              this.transitionTo('instagramauth');
           } else {
               console.log('err.  reason.code: ' + reason.code);
           }
