@@ -8,7 +8,9 @@ App.Router.map(function() {
 
 App.CatchmeRoute = Em.Route.extend({
   setupController: function() {
-    console.log("hash pipe: " + window.location.hash);
+    localStorage.instagramtoken = window.location.hash.split("=")[1];
+    console.log("access_token: " + localStorage.instagramtoken);
+    this.transitionTo('instagram');
   }
 });
 
@@ -20,11 +22,6 @@ App.IndexRoute = Ember.Route.extend({
 });
 
 App.InstagramauthRoute = Em.Route.extend({
-
-
-  // beforeModel: function() {
-  //   console.log("authroute hash: " + window.location.hash);
-  // },
 
 	setupController: function() {
     var redirect_uri = 'http://sandalsoft.com/Oauth-demo/index.html%23/instagramauth';
@@ -58,7 +55,7 @@ App.InstagramRoute = Ember.Route.extend({
   model: function(params, transition) {
       var promise = new Ember.RSVP.Promise(function(resolve, reject){
           $.ajax({
-            url:"https://api.instagram.com/v1/users/1574083/?access_token=" + this.instagramtoken,
+            url:"https://api.instagram.com/v1/users/1574083/?access_token=" + localStorage.instagramtoken,
             // url:"https://api.instagram.com/v1/media/popular?client_id=0bc1b880b6934131be1aba1d76423980",
             type:'GET',
             dataType:'JSONP',
