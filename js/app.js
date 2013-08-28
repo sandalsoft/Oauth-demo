@@ -39,8 +39,8 @@ App.InstagramRoute = Ember.Route.extend({
   model: function(params, transition) {
       var promise = new Ember.RSVP.Promise(function(resolve, reject){
           $.ajax({
-            // url:"https://api.instagram.com/v1/users/1574083/?access_token=NO_TOKEN",
-            url:"https://api.instagram.com/v1/media/popular?client_id=0bc1b880b6934131be1aba1d76423980",
+            url:"https://api.instagram.com/v1/users/1574083/?access_token=NO_TOKEN",
+            // url:"https://api.instagram.com/v1/media/popular?client_id=0bc1b880b6934131be1aba1d76423980",
             type:'GET',
             dataType:'JSONP',
             }).then(function(json){
