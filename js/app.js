@@ -29,8 +29,8 @@ App.InstagramRoute = Ember.Route.extend({
   events: {
       error: function(reason, transition) {
           if (reason.code === 400) {
-              console.log('in evetns hook.  Unauthorized, redirecting to: ' + App.Instagram.authURL);
-              this.transitionTo(App.InstagramauthRoute);
+              // console.log('in evetns hook.  Unauthorized, redirecting to: ' + App.Instagram.authURL);
+              this.transitionTo(App.Instagramauth);
           } else {
               console.log('err.  reason.code: ' + reason.code);
           }
@@ -56,16 +56,19 @@ App.InstagramRoute = Ember.Route.extend({
   }
 });
 
-App.Instagram = Em.Object.extend({
+App.LoadingRoute = Ember.Route.extend({});
 
-});
 
-App.Instagram.reopenClass ({
-	clientId: '0bc1b880b6934131be1aba1d76423980',
-	redirectUri: 'http://sandalsoft.com/Oauth-demo/index.html#/instagram',
-	authURL: 'https://instagram.com/oauth/authorize/?client_id=' + '0bc1b880b6934131be1aba1d76423980' + '&redirect_uri=' + 'file:///Users/Eric/Development/Projects/js/_Ember/Oauth-demo/index.html#/instagram' + '&response_type=token',
-	token: localStorage.Instagram_token,
-	tokenChanged: function() {
-	   localStorage.token = this.get('Instagram_token');
-	 }.observes('token')
-});
+// App.Instagram = Em.Object.extend({
+
+// });
+
+// App.Instagram.reopenClass ({
+// 	clientId: '0bc1b880b6934131be1aba1d76423980',
+// 	redirectUri: 'http://sandalsoft.com/Oauth-demo/index.html#/instagram',
+// 	authURL: 'https://instagram.com/oauth/authorize/?client_id=' + '0bc1b880b6934131be1aba1d76423980' + '&redirect_uri=' + 'file:///Users/Eric/Development/Projects/js/_Ember/Oauth-demo/index.html#/instagram' + '&response_type=token',
+// 	token: localStorage.Instagram_token,
+// 	tokenChanged: function() {
+// 	   localStorage.token = this.get('Instagram_token');
+// 	 }.observes('token')
+// });
