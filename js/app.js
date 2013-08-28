@@ -48,7 +48,7 @@ App.InstagramRoute = Ember.Route.extend({
   
               this.transitionTo('instagramauth');
           } else {
-              console.log('err.  reason.code: ' + reason.code);
+              console.log('err.  reason.code: ' + JSON.stringify(reason));
           }
       }
   },
@@ -61,6 +61,7 @@ App.InstagramRoute = Ember.Route.extend({
             dataType:'JSONP',
             }).then(function(json){
                 if (json.meta.code ===400) {
+
                     reject(json.meta);
                 }
                 else {
