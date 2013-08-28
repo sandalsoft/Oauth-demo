@@ -62,10 +62,11 @@ App.InstagramRoute = Ember.Route.extend({
             dataType:'JSONP',
             }).then(function(json){
                 if (json.meta.code ===400) {
-
+                    console.log("reject json: " + JSON.stringify(json));
                     reject(json.meta);
                 }
                 else {
+                    console.log("RESOLVE json: " + JSON.stringify(json));
                     resolve(json.data);
                 }   
         });
