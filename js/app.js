@@ -131,6 +131,7 @@ App.Instagram.reopenClass({
         }
         // IF not in localStorage, hit the API with the passed in username
         else {
+          console.log('userid not in localstorage');
           $.ajax({
             url:'https://api.instagram.com/v1/users/search?q=' + username + '&access_token=' + localStorage.instagramtoken,
             type:'GET',
@@ -144,7 +145,7 @@ App.Instagram.reopenClass({
                 // Got a result back with no errors
                 else {
                     var userid = json.data[0].id;
-                    // console.log("RESOLVE json: " + JSON.stringify(json.data.id)); 
+                    console.log("RESOLVE json: " + JSON.stringify(json.data.id)); 
                     // Create dummy object to hold username and newly retrieved 
                     console.log("~~json.data.id: " + JSON.stringify(userid));
                     var instLS = {'username': username, 'userid': userid};
