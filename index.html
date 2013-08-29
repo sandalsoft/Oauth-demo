@@ -24,6 +24,10 @@
 
 
   <script type="text/x-handlebars" data-template-name="instagram">
+   <form class='form-inline' {{action getInstagramFeed on='submit'}}>
+                {{input value=username type="text"}}
+  </form>
+
   <p> Pics <a href=#/instagramauth>auth here</a>
   <ul>
   {{#each item in model}}

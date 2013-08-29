@@ -40,11 +40,89 @@ App.InstagramauthRoute = Em.Route.extend({
 });
 
 App.InstagramController = Em.ArrayController.extend({
+  getInstagramFeed: function(controller) {
+    console.log('text entry: ' + this.get('username'));
+    var myinstgramfeed = App.Instagram.create({username: this.get('username')});
+    this.setProperties({model: myinstgramfeed});
+  },
+
   instagramtoken: localStorage.instagramtoken,
   instagramtokenChanged: function() {
       localStorage.instagramtoken = this.get('instagramtoken');
    }.observes('instagramtoken'),
 
+   content: [],
+
+  
+});
+
+
+App.Instagram = Ember.Object.extend({
+  loadedFeed: false,
+
+  init: function() {
+    var isnum = /^\d+$/.test(this.username);
+
+    if (!isnum) {
+      console.log('not all numbers, getting userid for: ' + this.username);
+      // this.userid = App.Instagram.getUserid(this.get('username'));
+      $.ajax({
+        url:'https://api.instagram.com/v1/users/search?q=' + this.username + '&access_token=' + localStorage.instagramtoken,
+        type:'GET',
+        dataType:'JSONP',
+      }).then(function(json){
+        if (json.meta.code !==200) {
+          console.log('Error searging for userId: json: ' + JSON.stringify(json));
+        }
+        else {
+          var userid = json.data[0].id;
+          console.log('got search: ' + JSON.stringify(json.data[0].id));
+          var myfeed = this;
+          if (!myfeed.loadedFeed) {
+            var promise = new Ember.RSVP.Promise(function(resolve, reject){
+              $.ajax({
+                url:'https://api.instagram.com/v1/users/' + userid + '/media/recent?access_token=' + localStorage.instagramtoken,
+                type:'GET',
+                dataType:'JSONP',
+                }).then(function(json){
+                    if (json.meta.code ===400) {
+                        console.log("reject json: " + JSON.stringify(json));
+                        reject(json.meta);
+                    }
+                    else {
+                        console.log("RESOLVE json: " + JSON.stringify(json)); 
+                        resolve(json.data);
+                    }   
+                });
+              })
+            return promise;
+          }
+        } 
+    });
+    }
+  },
+});
+
+App.Instagram.reopenClass({
+  getUserid: function(params) {
+      var promise = new Ember.RSVP.Promise(function(resolve, reject){
+        $.ajax({
+          url:'https://api.instagram.com/v1/users/search?q=' + params + '&access_token=' + localStorage.instagramtoken,
+          type:'GET',
+          dataType:'JSONP',
+          }).then(function(json){
+              if (json.meta.code ===400) {
+                  console.log("reject json: " + JSON.stringify(json));
+                  reject(json.meta);
+              }
+              else {
+                  console.log("RESOLVE json: " + JSON.stringify(json.data.id)); 
+                  resolve(json.data.id);
+              }   
+          });
+        })
+      return promise;
+    }
 });
 
 App.InstagramRoute = Ember.Route.extend({
@@ -63,7 +141,7 @@ App.InstagramRoute = Ember.Route.extend({
       var promise = new Ember.RSVP.Promise(function(resolve, reject){
         console.log("token: " + localStorage.instagramtoken);
           $.ajax({
-            url:"https://api.instagram.com/v1/users/1574083/media/recent?access_token=" + localStorage.instagramtoken,
+            url:"https://api.instagram.com/v1/users/528979886/media/recent?access_token=" + localStorage.instagramtoken,
             // url:"https://api.instagram.com/v1/media/popular?client_id=0bc1b880b6934131be1aba1d76423980",
             type:'GET',
             dataType:'JSONP',
@@ -84,7 +162,7 @@ App.InstagramRoute = Ember.Route.extend({
 
 App.LoadingRoute = Ember.Route.extend({});
 
-
+// 348191526.0bc1b88.913be5df5fa145f7a06de980d086592e
 // App.Instagram = Em.Object.extend({
 
 // });
