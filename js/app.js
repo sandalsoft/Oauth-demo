@@ -46,25 +46,27 @@ App.InstagramRoute = Ember.Route.extend({
   model: function() {
     // App.Instagram.getUserid('lisallamontenegro').then(function(userid) {
       return App.Instagram.getFakeUserid('f').then(function(userid) {
-        console.log('feefuserid: ' + userid);
-        return Ember.RSVP.Promise(function(resolve, reject){
-          $.ajax({
-            url:'https://api.instagram.com/v1/users/' + userid + '/media/recent?access_token=' + localStorage.instagramtoken,
-            type:'GET',
-            dataType:'JSONP',
-          }).then(function(json){
-            if (json.meta.code !== 200) {
-              console.log("reject json: " + JSON.stringify(json));
-              reject(json.meta);
-                } // if
-            else {
-              console.log('%%# in feed: ' + json.data.length);
-              resolve (json.data);
-              // return json.data;
-            } // else 
-          }); //then()
-        }); //var promise
+        return App.Instagram.getFeed(userid);
       });
+
+        // Ember.RSVP.Promise(function(resolve, reject){
+        //   $.ajax({
+        //     url:'https://api.instagram.com/v1/users/' + userid + '/media/recent?access_token=' + localStorage.instagramtoken,
+        //     type:'GET',
+        //     dataType:'JSONP',
+        //   }).then(function(json){
+        //     if (json.meta.code !== 200) {
+        //       console.log("reject json: " + JSON.stringify(json));
+        //       reject(json.meta);
+        //         } // if
+        //     else {
+        //       console.log('%%# in feed: ' + json.data.length);
+        //       resolve (json.data);
+        //       // return json.data;
+        //     } // else 
+        //   }); //then()
+        // }); //var promise
+      // });
       // var userid = 44037631;
       
     // });//App.Instagram.getUserid()
@@ -96,55 +98,67 @@ App.Instagram = Ember.Object.extend({
 
 App.Instagram.reopenClass({
    getFakeUserid: function(username) {
-    var promise = new Ember.RSVP.Promise(function(resolve, reject){
+    return promise = new Ember.RSVP.Promise(function(resolve, reject){
       resolve(44037631);
     });
-    return promise;
   },
   getFeed: function(userid) {
-    console.log('getFeed()');
-    $.ajax({
-      url:'https://api.instagram.com/v1/users/' + userid + '/media/recent?access_token=' + localStorage.instagramtoken,
-      type:'GET',
-      dataType:'JSONP',
-    }).then(function(json){
-      if (json.meta.code !== 200) {
-        console.log("reject json: " + JSON.stringify(json));
-          // reject(json.meta);
-        } // if
-        else {
-          console.log('# in feed: ' + json.data.length);
-          return json.data;
-        } // else 
-    }); // .ajax
+    return promise = new Ember.RSVP.Promise(function(resolve, reject){
+      $.ajax({
+        url:'https://api.instagram.com/v1/users/' + userid + '/media/recent?access_token=' + localStorage.instagramtoken,
+        type:'GET',
+        dataType:'JSONP',
+      }).then(function(json){
+        if (json.meta.code !== 200) {
+          console.log("reject json: " + JSON.stringify(json));
+            reject(json.meta);
+          } // if
+          else {
+            resolve(json.data);
+          } // else 
+      }); // .ajax
+    });
   },//getFeed()
 
 
   getUserid: function(username) {
     var promise = new Ember.RSVP.Promise(function(resolve, reject){
+        // Check local storage for userid.
+        if (JSON.parse(localStorage.instagram).userid) {
+          console.log("LSuserid: " + JSON.parse(localStorage.instagram).userid);
+            resolve(JSON.parse(localStorage.instagram).userid);
+        }
+        // IF not in localStorage, hit the API with the passed in username
+        else {
           console.log('userid not in localstorage');
           $.ajax({
             url:'https://api.instagram.com/v1/users/search?q=' + username + '&access_token=' + localStorage.instagramtoken,
             type:'GET',
             dataType:'JSONP',
-          }).then(function(json){
+            }).then(function(json){
               // Something went wrong.
-              if (json.meta.code !==200) {
-                console.log("reject json: " + JSON.stringify(json));
-                    // reject(json.meta);
-                  }
+                if (json.meta.code !==200) {
+                    console.log("reject json: " + JSON.stringify(json));
+                    reject(json.meta);
+                }
                 // Got a result back with no errors
                 else {
-                  var userid = json.data[0].id;
+                    var userid = json.data[0].id;
+                    console.log("RESOLVE json: " + JSON.stringify(json.data.id)); 
+                    // Create dummy object to hold username and newly retrieved 
+                    console.log("~~json.data.id: " + JSON.stringify(userid));
+                    var instLS = {'username': username, 'userid': userid};
+                    // set localStorage to username and userid
+                    localStorage.setItem('instagram',JSON.stringify(instLS))
                     // resolve the userid to be returned by the promise
+                    console.log("returning: " + userid);
                     resolve(userid);
-                    // return userid;
-                  }   
-                });
-        // } // else
+                }   
+            });
+        } // else
     }) // promise
-return promise;
-  } //App.Instagram.getUserid()
+    return promise;
+  } //getUserid
 });
 
 App.InstagramController = Em.ArrayController.extend({
