@@ -28,9 +28,13 @@
                 {{input value=username type="text"}}
   </form>
 
+{{#each item in instagram}}
+hi there, {{item}}<br>
+{{/each}}
   <p> Pics <a href=#/instagramauth>auth here</a>
   <ul>
-  {{#each item in model}}
+
+  {{#each item in instagram}}
     <li><a target="_blank" {{bindAttr href="item.images.standard_resolution.url"}}>
           <img class="thumbnail" {{bindAttr src="item.images.thumbnail.url"}}/>
       </a>
@@ -38,6 +42,7 @@
       </li>
   {{/each}}
   </ul>
+
   </script>
 
 <script type="text/x-handlebars" data-template-name="instagramauth">
