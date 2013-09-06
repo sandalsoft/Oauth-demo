@@ -34,44 +34,35 @@ App.CatchmeRoute = Em.Route.extend({
 
 
 App.InstagramRoute = Ember.Route.extend({
-  model: function() {
-    var multiModel = Ember.Object.create(
-      {
-        instagram: App.Instagram.getStuff(),
-        tits: App.Tits.getTitsNow(),
-      });
-    return multiModel;
-    // return App.Instagram.getUserid(localStorage.instagram_username).then(function(userid) {
-    //   return App.Instagram.getStuff(userid);
-    // });
-  },
+  // model: function() {
+  //   var multiModel = Ember.Object.create(
+  //     {
+  //       instagram: App.Instagram.getStuff(localStorage.instagram_username),
+  //       tits: App.Tits.getTitsNow(),
+  //     });
+  //   return multiModel;
+  //   // return App.Instagram.getUserid(localStorage.instagram_username).then(function(userid) {
+  //   //   return App.Instagram.getStuff(userid);
+  //   // });
+  // },
   setupController: function(controller, model) {
-    controller.set('instagram', model.instagram);
-    controller.set('tits', model.tits);
+    // controller.set('instagram', App.Instagram.getStuff(localStorage.instagram_username));
+    // controller.set('tits', model.tits);
+    controller.getInstagramFeed();
   }
 
 });
 
-App.Tits = Em.Object.extend({});
-App.Tits.reopenClass({
-  getTitsPromise: function() {
-    return promise = new Ember.RSVP.Promise(function(resolve, reject){
-      resolve(["big", "ol", "titties"]);
-    });
-  },
-  getTits: function() {
-    setTimeout(function() {
-        console.log('returning tits');
-        return ["big", "ol", "titties"];
-    }, 2000);
-  },
-  getTitsNow: function() {
-    return ["big", "ol", "titties"];
-  },
-});
 
 App.InstagramController = Em.ArrayController.extend({
   content: [],
+
+    getInstagramFeed: function(controller) {
+      this.setProperties({
+        instagram: App.Instagram.getStuff(this.get('username'))
+      });//setProperties()
+    },//getInstagramFeed()
+
 
   instagramtoken: localStorage.instagramtoken,
   instagramtokenChanged: function() {
@@ -87,15 +78,6 @@ App.InstagramController = Em.ArrayController.extend({
   useridChanged: function() {
     localStorage.instagram_userid = this.get('userid');
   }.observes('userid'),
-
-  actions: {
-    getInstagramFeed: function(controller) {
-      console.log('gettingController');
-      return App.Instagram.getUserid(this.get('username')).then(function(userid) {
-        this.setProperties({model:  App.Instagram.getFeed(userid)});
-      });  
-    },
-  },
 });
 
 
@@ -104,58 +86,59 @@ App.Instagram = Ember.Object.extend();
 App.Instagram.reopenClass({
   getFakeUserid: function(username) {
     console.log(username);
-    return promise = new Ember.RSVP.Promise(function(resolve, reject){
-      resolve(44037631);
-    });
+    return 44037631;
+    // return promise = new Ember.RSVP.Promise(function(resolve, reject){
+    //   resolve(44037631);
+    // });
   },
-  getStuff: function(userid) {
+  getStuff: function(username) {
     console.log('getting feed');
-    var feed = Em.A();
-      $.ajax({
-        url:'https://api.instagram.com/v1/users/' + 44037631 + '/media/recent?access_token=' + localStorage.instagramtoken,
-        type:'GET',
-        dataType:'JSONP',
-      }).then(function(json){
-        json.data.forEach(function(entry){
-         var entry = App.Instagramactivity.create(entry);
-         feed.addObject(entry); 
-        });
-      }); // .ajax
-    return feed;
-  },//getFeed()
-  getFeed: function(userid) {
-    console.log('getting feed');
-    return promise = new Ember.RSVP.Promise(function(resolve, reject){
-      $.ajax({
-        url:'https://api.instagram.com/v1/users/' + userid + '/media/recent?access_token=' + localStorage.instagramtoken,
-        type:'GET',
-        dataType:'JSONP',
-      }).then(function(json){
-        if (json.meta.code !== 200) {
-          console.log("reject json: " + JSON.stringify(json));
-            reject(json.meta);
-          } // if
+    // return App.Instagram.getBalls(username).then(function(userid) {
+      var feed = Em.A();
+        $.ajax({
+          url:'https://api.instagram.com/v1/users/' + App.Instagram.getBalls(username) + '/media/recent?access_token=' + localStorage.instagramtoken,
+          type:'GET',
+          dataType:'JSONP',
+        }).then(function(json){
+          json.data.forEach(function(entry){
+           var entry = App.Instagramactivity.create(entry);
+           feed.addObject(entry); 
+          });
+        }); // .ajax
+      return feed;
+    // }); // getUserid()
+  }, //getStuff()
+ getBalls: function(username) {
+      // Check local storage for userid.
+      if (/^\d+$/.test(localStorage.instagram_userid)) {
+        return localStorage.instagram_userid;
+      } //if{}
+
+      // not in localStorage, hit the API with the passed in username
+      else {
+        $.ajax({
+          url: 'https://api.instagram.com/v1/users/search?q=' + username + '&access_token=' + localStorage.instagramtoken,
+          type: 'GET',
+          dataType: 'JSONP',
+        }).then(function(json) {
+          // Userid seach error
+          if (json.meta.code !== 200) {
+            console.log("reject json: " + JSON.stringify(json));
+            return json.meta;
+          } //if{}
+
+          // else got a result back with no errors
           else {
-            console.log('feed data: ' + json.data[0].id);
-            resolve(json.data);
-          } // else 
-      }); // .ajax
-    });
-  },//getFeed()
-  saveUser: function(userObj) {
-    // Pull localStorage array of users into local var
-    var tempArray = JSON.parse(localStorage.Instagram);
+            var userid = json.data[0].id;
+            console.log('userid: ' + userid);
 
-    // 1 if userObj.username exists in tempArray , 0 if it doesn't
-    if ($.grep(tempArray, function(e){ return e.username === userObj.username; }).length === 0) {
-      
-      //add new userObj to existing array of users
-      tempArray.push(userObj);
-
-      // Set localStorage.Instagram to array containing new userObj
-      localStorage.setItem('Instagram',JSON.stringify(tempArray));
-    }//if{}
-  },//saveUser()
+            // Save user to localStorage
+            localStorage.instagram_userid = userid;
+            return userid;
+          } // else{}  
+        }); // $.ajax().then
+      } // else{}
+    }, // getUserid
   getUserid: function(username) {
     console.log('getUserid()');
     return promise = new Ember.RSVP.Promise(function(resolve, reject){
@@ -207,6 +190,25 @@ App.Instagramactivity = Em.Object.extend({
     return this.get('caption.text');
   }.property('caption.text'),
 
+});
+
+
+App.Tits = Em.Object.extend({});
+App.Tits.reopenClass({
+  getTitsPromise: function() {
+    return promise = new Ember.RSVP.Promise(function(resolve, reject){
+      resolve(["big", "ol", "titties"]);
+    });
+  },
+  getTits: function() {
+    setTimeout(function() {
+        console.log('returning tits');
+        return ["big", "ol", "titties"];
+    }, 2000);
+  },
+  getTitsNow: function() {
+    return ["big", "ol", "titties"];
+  },
 });
 
 App.InstagramauthRoute = Em.Route.extend({
