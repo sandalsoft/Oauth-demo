@@ -39,7 +39,7 @@ App.InstagramRoute = Ember.Route.extend({
   model: function() {
     var multiModel = Ember.Object.create(
       {
-        instagram: App.Instagram.getAss(localStorage.instagram_username),
+        // instagram: App.Instagram.getStuff(localStorage.instagram_username),
         // tits: App.Tits.getTitsNow(),
       });
     return multiModel;
@@ -48,7 +48,13 @@ App.InstagramRoute = Ember.Route.extend({
     // });
   },
   setupController: function(controller, model) {
-    controller.set('instagram', model.instagram);
+
+    var useridPromise = App.Instagram.getUseridPromise(localStorage.instagram_username);
+    useridPromise.then(function(userid) {
+        controller.set('instagram', App.Instagram.getStuff(userid));
+    });
+
+    // controller.set('instagram', model.instagram);
     // controller.set('tits', model.tits);
     // controller.getInstagramFeed();
   }
@@ -86,12 +92,15 @@ App.InstagramController = Em.ArrayController.extend({
 App.Instagram = Ember.Object.extend();
 
 App.Instagram.reopenClass({
-  getFakeUserid: function(username) {
-    console.log(username);
-    return 44037631;
-    // return promise = new Ember.RSVP.Promise(function(resolve, reject){
-    //   resolve(44037631);
-    // });
+  getRealid: function(username) {
+    $.ajax({
+          url: 'https://api.instagram.com/v1/users/search?q=' + username + '&access_token=' + localStorage.instagramtoken,
+          type: 'GET',
+          dataType: 'JSONP',
+        }).then(function(json) {
+          var userid = json.data[0].id;
+          return userid;
+        });
   },
   
   getAss: function(username) {
@@ -122,28 +131,25 @@ App.Instagram.reopenClass({
     }) //ajax()
   },
 
-  getStuff: function(username) {
+  getStuff: function(userid) {
     console.log('getting feed');
-    return App.Instagram.getUseridPromise(username).then(function(userid) {
-      var feed = Em.A();
-        $.ajax({
-          url:'https://api.instagram.com/v1/users/' + userid + '/media/recent?access_token=' + localStorage.instagramtoken,
-          type:'GET',
-          dataType:'JSONP',
-        }).then(function(json){
-          json.data.forEach(function(entry){
-           var entry = App.Instagramactivity.create(entry);
-           feed.addObject(entry); 
-          });
-        }); // .ajax
-      return feed;
-    }); // getUserid()
+    var feed = Em.A();
+    $.ajax({
+      url: 'https://api.instagram.com/v1/users/' + userid + '/media/recent?access_token=' + localStorage.instagramtoken,
+      type: 'GET',
+      dataType: 'JSONP',
+    }).then(function(json) {
+      json.data.forEach(function(entry) {
+        var entry = App.Instagramactivity.create(entry);
+        feed.addObject(entry);
+      });
+    }); // .ajax
+    return feed;
   }, //getStuff()
 
   getUseridPromise: function(username, access_token) {
     console.log('getUserid()');
     return promise = new Ember.RSVP.Promise(function(resolve, reject) {
-      console.log('userid not in localstorage');
       resolve($.ajax({
         url: 'https://api.instagram.com/v1/users/search?q=' + username + '&access_token=' + localStorage.instagramtoken,
         type: 'GET',
