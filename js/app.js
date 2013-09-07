@@ -31,14 +31,21 @@ App.CatchmeRoute = Em.Route.extend({
 
 
 ///////////////////////////////////////
+///////////////////////////////////////
+///////////////////////////////////////
 
 
 App.InstagramRoute = Ember.Route.extend({
   model: function() {
     var multiModel = Ember.Object.create(
       {
+<<<<<<< HEAD
+        instagram: App.Instagram.getAss(localStorage.instagram_username),
+        // tits: App.Tits.getTitsNow(),
+=======
         instagram: App.Instagram.getStuff(localStorage.instagram_username),
         tits: App.Tits.getTitsNow(),
+>>>>>>> master
       });
     return multiModel;
     // return App.Instagram.getUserid(localStorage.instagram_username).then(function(userid) {
@@ -46,9 +53,9 @@ App.InstagramRoute = Ember.Route.extend({
     // });
   },
   setupController: function(controller, model) {
-    // controller.set('instagram', App.Instagram.getStuff(localStorage.instagram_username));
+    controller.set('instagram', model.instagram);
     // controller.set('tits', model.tits);
-    controller.getInstagramFeed();
+    // controller.getInstagramFeed();
   }
 
 });
@@ -90,6 +97,45 @@ App.InstagramController = Em.ArrayController.extend({
 App.Instagram = Ember.Object.extend();
 
 App.Instagram.reopenClass({
+<<<<<<< HEAD
+  getFakeUserid: function(username) {
+    console.log(username);
+    return 44037631;
+    // return promise = new Ember.RSVP.Promise(function(resolve, reject){
+    //   resolve(44037631);
+    // });
+  },
+  
+  getAss: function(username) {
+    $.ajax({
+      url: 'https://api.instagram.com/v1/users/search?q=' + username + '&access_token=' + localStorage.instagramtoken,
+      type: 'GET',
+      dataType: 'JSONP',
+    }).then(function(json) {
+      var userid = json.data[0].id;
+      console.log('userid: ' + userid);
+      // Save user to localStorage
+      localStorage.instagram_userid = userid;
+      var feed = Em.A();
+      $.ajax({
+        url: 'https://api.instagram.com/v1/users/' + userid + '/media/recent?access_token=' + localStorage.instagramtoken,
+        type: 'GET',
+        dataType: 'JSONP',
+      }).then(function(json) {
+        // console.log("data: " + JSON.stringify( json.data));
+        json.data.forEach(function(entry) {
+          var entry = App.Instagramactivity.create(entry);
+          feed.addObject(entry);
+        });
+        console.log("feed: " + feed[0].created_time);
+        return feed;
+      }); // .ajax
+
+    }) //ajax()
+  },
+
+  getStuff: function(username) {
+=======
   // getFakeUserid: function(username) {
   //   console.log(username);
   //   return 44037631;
@@ -105,8 +151,9 @@ App.Instagram.reopenClass({
       reject(error);
     });
 
+>>>>>>> master
     console.log('getting feed');
-    // return App.Instagram.getBalls(username).then(function(userid) {
+    return App.Instagram.getUseridPromise(username).then(function(userid) {
       var feed = Em.A();
         $.ajax({
           url:'https://api.instagram.com/v1/users/' + userid + '/media/recent?access_token=' + localStorage.instagramtoken,
@@ -119,8 +166,10 @@ App.Instagram.reopenClass({
           });
         }); // .ajax
       return feed;
-    // }); // getUserid()
+    }); // getUserid()
   }, //getStuff()
+<<<<<<< HEAD
+=======
  getUserid: function(username, access_token) {
   // Check local storage for userid.  Always lookup userid for when username changes it refreshes.  
   // This async .ajax() call breaks my shit now
@@ -156,11 +205,19 @@ App.Instagram.reopenClass({
     } // else{}./d+
   }, // getUserid
 
+>>>>>>> master
 
   getUseridPromise: function(username, access_token) {
     console.log('getUserid()');
     return promise = new Ember.RSVP.Promise(function(resolve, reject) {
       console.log('userid not in localstorage');
+<<<<<<< HEAD
+      resolve($.ajax({
+        url: 'https://api.instagram.com/v1/users/search?q=' + username + '&access_token=' + localStorage.instagramtoken,
+        type: 'GET',
+        dataType: 'JSONP',
+      }).then(function(json) {
+=======
       $.ajax({
         url: 'https://api.instagram.com/v1/users/search?q=' + username + '&access_token=' + access_token,
         type: 'GET',
@@ -174,16 +231,25 @@ App.Instagram.reopenClass({
 
         // else got a result back with no errors
         else {
+>>>>>>> master
           var userid = json.data[0].id;
           console.log('userid: ' + userid);
           // Save user to localStorage
           localStorage.instagram_userid = userid;
+<<<<<<< HEAD
+          return userid;
+      }) //ajax()
+      ); //resolve
+    }) // promise
+  },//getUseridPromise
+=======
           resolve(userid);
         } //else{}  
       });
     }) // promise
   } //getUseridPromise
 
+>>>>>>> master
 });
 
 App.Instagramactivity = Em.Object.extend({
@@ -199,12 +265,25 @@ App.Instagramactivity = Em.Object.extend({
 
 App.Tits = Em.Object.extend({});
 App.Tits.reopenClass({
-  getTitsPromise: function() {
-    return promise = new Ember.RSVP.Promise(function(resolve, reject){
-      resolve(["big", "ol", "titties"]);
+  getTitsPromise: function(username) {
+   App.Tits.getTitsid(username).then(function(userid) {
+      console.log('titsId: ' + userid);
+      var feed = Em.A();
+      setTimeout(function() {
+        console.log('returning titsPromise');
+        return ["big", "ol", "titties"];
+      }, 1000);
     });
   },
-  getTits: function() {
+  getTitsid: function() {
+    return promise = new Ember.RSVP.Promise(function(resolve, reject){
+      setTimeout(function() {
+        resolve(30662803);
+      }, 1000);
+      
+    });
+  },
+  getTitsDelay: function() {
     setTimeout(function() {
         console.log('returning tits');
         return ["big", "ol", "titties"];
@@ -213,6 +292,7 @@ App.Tits.reopenClass({
   getTitsNow: function() {
     return ["big", "ol", "titties"];
   },
+
 });
 
 App.InstagramauthRoute = Em.Route.extend({
